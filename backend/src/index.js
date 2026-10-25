@@ -10,6 +10,8 @@ import path from "path";
 import { connectDB } from "./lib/db.js";
 import job from "./lib/cron.js";
 
+import clerkWebhook from "./webhooks/clerk.webhook.js";
+
 import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
@@ -19,6 +21,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 const publicDir = path.join(process.cwd(), "public");
 
 // Middlewares
+app.use("/api/webhooks/clerk", express.raw({ type: "application/json" }), clerkWebhook);
 app.use(cors({
     origin: FRONTEND_URL,
     credentials: true
