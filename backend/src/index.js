@@ -11,6 +11,7 @@ import { connectDB } from "./lib/db.js";
 import job from "./lib/cron.js";
 
 import clerkWebhook from "./webhooks/clerk.webhook.js";
+import authRoutes from "./routes/auth.route.js";
 
 import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '1.1.1.1']);
@@ -32,6 +33,8 @@ app.use(clerkMiddleware());
 app.get("/health", (req, res) => {
     res.status(200).json({ ok: true });
 });
+
+app.use("/api/auth", authRoutes);
 
 // if the public directory exists, serve the static files
 // this is for production build
