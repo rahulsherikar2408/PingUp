@@ -7,7 +7,7 @@ function hasImageKitConfig() {
 }
 
 function createFileName(originalName = "upload"){
-    const safeName = originalName.replace(/[^a-zA-z0-9._-]/g, "_");
+    const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, "_");
     return `chat-${Date.now()}-${safeName}`;
 }
 
@@ -15,7 +15,7 @@ async function uploadChatMedia(file) {
     const fileName = createFileName(file.originalname);
 
     const result = await imagekit.files.upload({
-        file: await toFile(file.buffer, fileName, { type: file.mimetyoe }),
+        file: await toFile(file.buffer, fileName, { type: file.mimetype }),
         fileName,
         folder: "/chat",
     });

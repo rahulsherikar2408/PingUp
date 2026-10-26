@@ -27,8 +27,6 @@ function mapUserForList(user, onlineUsers) {
 
 function ChatSidebar() {
   const conversations = useChatStore((state) => state.conversations);
-
-  console.log(conversations);
   const users = useChatStore((state) => state.users);
 
   const searchQuery = useChatStore((state) => state.searchQuery);
@@ -121,7 +119,9 @@ function ChatSidebar() {
         >
           {filteredConversations.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-muted">
-              No conversations match your search.
+              {normalizedSearchQuery
+                ? "No conversations match your search."
+                : "No conversations yet. Switch to Users to start a chat!"}
             </p>
           ) : (
             filteredConversations.map((conversation) => (
@@ -137,7 +137,9 @@ function ChatSidebar() {
 
         <Tabs.Panel id="users" className="flex-1 overflow-x-hidden overflow-y-auto outline-none">
           {filteredUsers.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-muted">No people match your search.</p>
+            <p className="px-4 py-6 text-center text-sm text-muted">
+              {normalizedSearchQuery ? "No people match your search." : "No users found."}
+            </p>
           ) : (
             filteredUsers.map((user) => (
               <ConversationRow

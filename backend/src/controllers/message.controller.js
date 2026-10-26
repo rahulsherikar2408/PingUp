@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import { hasImageKitConfig, uploadChatMedia } from "../lib/imagekit.js";
@@ -14,7 +15,7 @@ export async function getUsersForSidebar(req, res) {
     res.status(200).json(filteredUsers);
   } catch (error) {
     console.error("Error in getUsersForSidebar:", error.message);
-    res.status(500).json({ message: "Intenal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
@@ -54,8 +55,10 @@ export async function getConversationsForSidebar(req, res) {
           as: "user",
         },
       },
-      // 5. Pull that profile out of the array and make it the document.
-      { $replaceRoot: { newRoot: { $first: "$user" } } },
+      // Unwind user to omit any deleted users and guarantee a non-null object for replaceRoot.
+      { $unwind: "$user" },
+      // 5. Pull that profile out and make it the root document.
+      { $replaceRoot: { newRoot: "$user" } },
       // 6. Hide the private clerkId field from the result.
       { $project: { clerkId: 0 } },
     ]);
@@ -71,6 +74,10 @@ export async function getMessages(req, res) {
   try {
     const { id: userToChatId } = req.params;
     const myId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(userToChatId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
 
     const messages = await Message.find({
       $or: [
@@ -92,6 +99,14 @@ export async function sendMessage(req, res) {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+      return res.status(400).json({ message: "Invalid receiver ID" });
+    }
+
+    if (!text?.trim() && !req.file) {
+      return res.status(400).json({ message: "Message content or media is required" });
+    }
+
     let imageUrl;
     let videoUrl;
 
@@ -108,7 +123,7 @@ export async function sendMessage(req, res) {
     const newMessage = new Message({
       senderId,
       receiverId,
-      text,
+      text: text?.trim() || "",
       image: imageUrl,
       video: videoUrl,
     });
@@ -117,8 +132,8 @@ export async function sendMessage(req, res) {
 
     const receiverSocketId = getReceiverSocketId(receiverId);
     // only send the message in realtime if user is online
-    if(receiverSocketId){
-        io.to(receiverSocketId).emit("newMessage", newMessage)
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
     res.status(201).json(newMessage);
