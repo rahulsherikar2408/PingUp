@@ -8,6 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    babel({ presets: [reactCompilerPreset()] })
+    babel({ presets: [reactCompilerPreset()] }),
   ],
+  ssr: {
+      noExternal: ['@heroui/react', '@react-aria/utils'],
+    },
+    optimizeDeps: {
+      include: ['@react-aria/utils'],
+    },
 })
