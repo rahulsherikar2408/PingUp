@@ -13,6 +13,7 @@ import job from "./lib/cron.js";
 import clerkWebhook from "./webhooks/clerk.webhook.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import streamRoutes from "./routes/stream.route.js";
 import { app, server } from "./lib/socket.js";
 
 import dns from "node:dns";
@@ -42,6 +43,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/stream", streamRoutes);
 
 // Error handler for API / Multer errors
 app.use((err, req, res, next) => {

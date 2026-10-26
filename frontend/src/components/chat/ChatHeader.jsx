@@ -1,20 +1,23 @@
 import { Avatar, Button } from "@heroui/react";
-import { ChevronLeftIcon, Volume2Icon, VolumeXIcon, XIcon } from "lucide-react";
+import { ChevronLeftIcon, VideoIcon, Volume2Icon, VolumeXIcon, XIcon } from "lucide-react";
 import { AppLogo } from "../AppLogo";
 import { AvatarWithOnlineIndicator } from "./AvatarWithOnlineIndicator";
 
 import { ThemePresetPicker } from "../ThemePresetPicker";
-
 import { ThemeToggle } from "../ThemeToggle";
 import { WallpaperPicker } from "../WallpaperPicker";
 
 import { useChatStore } from "../../store/useChatStore";
 import { useSelectedConversation } from "../../hooks/useSelectedConversation";
+import { useCallStore } from "../../store/useCallStore";
 
 export function ChatHeader() {
   const isSoundEnabled = useChatStore((state) => state.isSoundEnabled);
   const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
   const setSoundEnabled = useChatStore((state) => state.setSoundEnabled);
+
+  const startCall = useCallStore((state) => state.startCall);
+  const callStatus = useCallStore((state) => state.callStatus);
 
   const { activeConversation, isLargeScreen } = useSelectedConversation();
 
@@ -69,6 +72,28 @@ export function ChatHeader() {
       )}
 
       <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-0.5 sm:gap-1">
+        {activeConversation ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            isIconOnly
+            className="shrink-0 text-accent hover:bg-accent-soft"
+            aria-label="Start video call"
+            title="Start video call"
+            isDisabled={callStatus !== "idle"}
+            onPress={() =>
+              startCall({
+                _id: activeConversation.id,
+                fullName: activeConversation.peer.name,
+                profilePic: activeConversation.peer.avatarUrl,
+                email: activeConversation.peer.subtitle,
+              })
+            }
+          >
+            <VideoIcon className="size-5.5" strokeWidth={2} aria-hidden />
+          </Button>
+        ) : null}
+
         <div className="hidden min-[400px]:contents">
           <WallpaperPicker />
           <ThemePresetPicker />

@@ -29,6 +29,35 @@ io.on("connection", (socket) => {
   // io.emit() sends event to everyone - broadcast
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
+  // Video calling signaling events
+  socket.on("acceptCall", ({ callerId, callId }) => {
+    const callerSocketId = getReceiverSocketId(callerId);
+    if (callerSocketId) {
+      io.to(callerSocketId).emit("callAccepted", { callId });
+    }
+  });
+
+  socket.on("rejectCall", ({ callerId, callId }) => {
+    const callerSocketId = getReceiverSocketId(callerId);
+    if (callerSocketId) {
+      io.to(callerSocketId).emit("callRejected", { callId });
+    }
+  });
+
+  socket.on("cancelCall", ({ receiverId, callId }) => {
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("callCancelled", { callId });
+    }
+  });
+
+  socket.on("endCall", ({ peerId, callId }) => {
+    const peerSocketId = getReceiverSocketId(peerId);
+    if (peerSocketId) {
+      io.to(peerSocketId).emit("callEnded", { callId });
+    }
+  });
+
   // socket.on is used to listen for events
   socket.on("disconnect", () => {
     if (userId && userSocketMap[userId] === socket.id) delete userSocketMap[userId];
