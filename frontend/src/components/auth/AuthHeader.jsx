@@ -1,30 +1,23 @@
-import { APP_NAME, AppLogo } from "../AppLogo"
-import { ThemePresetPicker } from "../ThemePresetPicker"
-import { ThemeToggle } from "../ThemeToggle"
-import { WallpaperPicker } from "../WallpaperPicker"
-
+import { APP_NAME, AppLogo } from "../AppLogo";
+import { AppearanceControls } from "../AppearanceControls";
 
 function AuthHeader() {
   return (
-    <header className="sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b border-black/10 bg-[#F6F6F6]/95 px-3 py-2 backdrop-blur-md dark:border-white/10 dark:bg-[#1C1C1E]/95">
-        <div className="flex flex-1 items-center gap-2.5 px-1">
-        <AppLogo size={30} className="rounded-[7px]" alt="" />
+    <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-2 border-b border-border bg-surface/90 px-3 py-2 backdrop-blur-md sm:px-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-2.5">
+        <AppLogo size={32} className="size-8 shrink-0 rounded-[8px]" alt="" />
 
-        <div>
-          <p className="truncate text-[15px] font-semibold leading-tight">{APP_NAME}</p>
-          <p className="truncate text-xs text-[#8E8E93] dark:text-[#98989D]">Private session</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm sm:text-[15px] font-semibold leading-tight">{APP_NAME}</p>
+          <p className="hidden xs:block truncate text-xs text-muted">Private session</p>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-0.5">
-        <WallpaperPicker />
-
-        <ThemePresetPicker />
-
-        <ThemeToggle />
+      <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+        <AppearanceControls />
       </div>
     </header>
-  )
+  );
 }
 
-export default AuthHeader
+export default AuthHeader;

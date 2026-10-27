@@ -44,9 +44,9 @@ export function ChatComposer() {
   };
 
   return (
-    <footer className="shrink-0 border-t border-border px-1.5 pb-2 pt-2 sm:px-2">
+    <footer className="shrink-0 border-t border-border bg-surface/50 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-xs sm:px-3">
       {isSendingMedia ? (
-        <div className="mx-auto mb-2 flex max-w-full items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted">
+        <div className="mx-auto mb-2 flex max-w-full items-center gap-2 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs sm:text-sm text-muted">
           <LoaderIcon
             className="size-4 shrink-0 animate-spin text-accent"
             strokeWidth={2}
@@ -55,7 +55,7 @@ export function ChatComposer() {
           <span className="truncate">Uploading media...</span>
         </div>
       ) : null}
-      <div className="mx-auto flex w-full max-w-full items-end gap-1.5 px-0.5 sm:gap-2 sm:px-1">
+      <div className="mx-auto flex w-full max-w-full items-end gap-1.5 sm:gap-2">
         <input
           ref={mediaInputRef}
           type="file"
@@ -70,10 +70,12 @@ export function ChatComposer() {
           variant="ghost"
           isIconOnly
           isDisabled={isSendingMedia}
-          className="size-9 shrink-0 touch-manipulation self-end text-accent"
+          className="size-9 shrink-0 touch-manipulation self-end text-accent hover:bg-accent-soft transition-transform active:scale-95"
+          aria-label="Upload photo or video"
+          title="Upload photo or video"
           onPress={() => mediaInputRef.current?.click()}
         >
-          <ImageIcon className="size-5 sm:size-6" strokeWidth={2} />
+          <ImageIcon className="size-5 sm:size-5.5" strokeWidth={2} />
         </Button>
         <TextArea
           fullWidth
@@ -88,11 +90,19 @@ export function ChatComposer() {
               handleSend();
             }
           }}
-          className="flex-1 rounded-full"
+          className="flex-1 rounded-2xl text-[14px] sm:text-[15px]"
         />
 
-        <Button variant="primary" isIconOnly isDisabled={!composerText.trim()} onPress={handleSend}>
-          <SendHorizontalIcon className="size-5" />
+        <Button
+          variant="primary"
+          isIconOnly
+          isDisabled={!composerText.trim()}
+          className="size-9 shrink-0 touch-manipulation self-end shadow-md transition-transform active:scale-95"
+          aria-label="Send message"
+          title="Send message"
+          onPress={handleSend}
+        >
+          <SendHorizontalIcon className="size-4.5 sm:size-5" />
         </Button>
       </div>
     </footer>

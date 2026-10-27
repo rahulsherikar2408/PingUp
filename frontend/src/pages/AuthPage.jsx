@@ -4,14 +4,16 @@ import { AuthHeroPanel } from "../components/auth/AuthHeroPanel";
 import { useWallpaper } from "../context/wallpaper";
 
 function AuthPage() {
-
   const { frameStyle } = useWallpaper();
 
   return (
-    <div className="box-border flex min-h-dvh flex-col p-3 sm:p-5 md:p-8" style={frameStyle}>
-      <div className="mx-auto flex w-full max-w-368 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-background text-foreground">
+    <div
+      className="box-border flex min-h-dvh flex-col p-1 sm:p-4 md:p-8"
+      style={frameStyle}
+    >
+      <div className="mx-auto flex w-full max-w-368 flex-1 flex-col overflow-hidden rounded-xl sm:rounded-3xl border border-border bg-background text-foreground shadow-2xl">
         <AuthHeader />
-        <main className="relative flex flex-1 flex-col overflow-hidden md:flex-row">
+        <main className="relative flex flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
           <AuthHeroPanel />
           <AuthActionPanel />
         </main>

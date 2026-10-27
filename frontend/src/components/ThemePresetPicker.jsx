@@ -16,26 +16,33 @@ export function ThemePresetPicker() {
   return (
     <Modal.Root state={modal}>
       <Modal.Trigger>
-        <Button variant="ghost" size="sm" isIconOnly className="text-foreground">
-          <Palette className="size-5" />
+        <Button
+          variant="ghost"
+          size="sm"
+          isIconOnly
+          className="size-8 sm:size-8.5 shrink-0 text-foreground transition-transform active:scale-95"
+          aria-label="Change accent color preset"
+          title="Accent theme"
+        >
+          <Palette className="size-4.5 sm:size-5" />
         </Button>
       </Modal.Trigger>
 
       <Modal.Backdrop variant="opaque">
         <Modal.Container size="md" scroll="inside" placement="center">
-          <Modal.Dialog className="max-h-[85dvh] border border-white/10 bg-[#2a2a2c] text-foreground shadow-2xl">
-            <Modal.Header className="flex flex-row items-center justify-between gap-3 border-b border-white/10 pb-3">
-              <Modal.Heading className="text-lg font-semibold tracking-tight text-white">
+          <Modal.Dialog className="max-h-[85dvh] w-full max-w-lg border border-border bg-surface text-foreground shadow-2xl dark:border-white/10 dark:bg-[#1e1e22]">
+            <Modal.Header className="flex flex-row items-center justify-between gap-3 border-b border-border pb-3 dark:border-white/10">
+              <Modal.Heading className="text-lg font-semibold tracking-tight text-foreground dark:text-white">
                 Accent theme
               </Modal.Heading>
               <Modal.CloseTrigger />
             </Modal.Header>
 
-            <Modal.Body className="isolate pt-4">
-              <p className="mb-4 text-sm text-zinc-400">
-                HeroUI components use the accent color for primary actions and focus.
+            <Modal.Body className="isolate pt-4 pb-6">
+              <p className="mb-4 text-xs sm:text-sm text-muted dark:text-zinc-400">
+                Components use the accent color for active indicators, primary buttons, and focus.
               </p>
-              <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {HERO_UI_THEME_PRESETS.map((p) => {
                   const selected = themePreset === p.id;
                   return (
@@ -44,16 +51,16 @@ export function ThemePresetPicker() {
                       type="button"
                       onClick={() => handleSelect(p.id)}
                       className={[
-                        "relative flex flex-col items-center gap-2 rounded-xl p-2 text-center transition-colors",
+                        "relative flex flex-col items-center gap-2 rounded-xl p-2.5 text-center transition-all cursor-pointer",
                         selected
-                          ? "bg-white/10 ring-2 ring-accent ring-offset-2 ring-offset-[#2a2a2c]"
-                          : "hover:bg-white/6",
+                          ? "bg-accent-soft/40 ring-2 ring-accent ring-offset-2 ring-offset-surface dark:ring-offset-[#1e1e22]"
+                          : "hover:bg-foreground/5",
                       ].join(" ")}
                       aria-pressed={selected}
                     >
                       <span className="relative">
                         <span
-                          className="block size-14 shrink-0 rounded-full shadow-md ring-1 ring-white/20"
+                          className="block size-12 sm:size-14 shrink-0 rounded-full shadow-md ring-1 ring-black/10 dark:ring-white/20 transition-transform hover:scale-105"
                           style={{ background: p.swatch }}
                         />
 
@@ -66,7 +73,7 @@ export function ThemePresetPicker() {
                       <span
                         className={[
                           "text-[11px] font-medium leading-tight",
-                          selected ? "text-white" : "text-zinc-400",
+                          selected ? "font-semibold text-accent" : "text-muted dark:text-zinc-400",
                         ].join(" ")}
                       >
                         {p.label}

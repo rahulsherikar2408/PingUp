@@ -10,6 +10,7 @@ import {
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { Loader2Icon, XIcon } from "lucide-react";
 import { useCallStore } from "../../store/useCallStore";
+import { AppearanceControls } from "../AppearanceControls";
 
 function CallInterface() {
   const { useCallCallingState } = useCallStateHooks();
@@ -48,34 +49,38 @@ export function VideoCallModal() {
   if (!client || !call) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-0 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative flex h-full sm:h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-none sm:rounded-2xl border-0 sm:border border-border bg-background shadow-2xl">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-4 py-3">
-          <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-3 py-2.5 sm:px-4 sm:py-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
             {activePeer?.profilePic ? (
               <img
                 src={activePeer.profilePic}
                 alt={activePeer.fullName}
-                className="size-8 rounded-full object-cover"
+                className="size-7 sm:size-8 shrink-0 rounded-full object-cover"
               />
             ) : null}
-            <div>
-              <h2 className="text-sm font-semibold leading-none text-foreground">
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-xs sm:text-sm font-semibold leading-none text-foreground">
                 {activePeer?.fullName || "Video Call"}
               </h2>
-              <p className="text-xs text-muted">PingUp Video Call</p>
+              <p className="truncate text-[10px] sm:text-xs text-muted">PingUp Video Call</p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={endCall}
-            className="flex size-8 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-foreground transition-colors"
-            aria-label="Close"
-          >
-            <XIcon className="size-5" />
-          </button>
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+            <AppearanceControls compact showPreset={false} />
+            <button
+              type="button"
+              onClick={endCall}
+              className="flex size-8 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-foreground transition-colors cursor-pointer"
+              aria-label="Close"
+              title="End / Close Call"
+            >
+              <XIcon className="size-5" />
+            </button>
+          </div>
         </div>
 
         {/* Video stream container */}

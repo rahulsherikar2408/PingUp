@@ -1,9 +1,8 @@
 const cardClassName = [
-  "relative overflow-hidden rounded-[1.75rem]",
-  "border border-black/8 bg-white/75 backdrop-blur-2xl",
-  "shadow-[0_32px_90px_-24px_rgba(0,0,0,0.18),0_0_1px_rgba(0,0,0,0.06)]",
-  "dark:border-white/12 dark:bg-[#141416]/82",
-  "dark:shadow-[0_40px_100px_-28px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.06)_inset]",
+  "relative overflow-hidden rounded-2xl sm:rounded-[1.75rem]",
+  "border border-border bg-surface/85 backdrop-blur-2xl",
+  "shadow-[0_24px_70px_-20px_rgba(0,0,0,0.18)]",
+  "dark:bg-[#141416]/85 dark:shadow-[0_40px_100px_-28px_rgba(0,0,0,0.75)]",
 ].join(" ");
 
 export function AuthCardShell({ children }) {
@@ -29,7 +28,7 @@ export function AuthCardShell({ children }) {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent dark:via-accent/40"
           />
 
-          <div className="relative px-8 pb-9 pt-10 sm:px-10 sm:pb-10 sm:pt-11">{children}</div>
+          <div className="relative px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">{children}</div>
         </div>
       </div>
     </div>

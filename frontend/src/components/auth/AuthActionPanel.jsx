@@ -13,27 +13,28 @@ const logoTileClassName = [
 ].join(" ");
 
 const continueButtonClassName = [
-  "group relative h-13 overflow-hidden rounded-2xl text-[15px] font-semibold",
-  "shadow-xl shadow-accent/45 dark:shadow-accent/35",
+  "group relative h-12 sm:h-13 overflow-hidden rounded-2xl text-[15px] font-semibold",
+  "shadow-xl shadow-accent/35",
   "after:pointer-events-none after:absolute after:inset-0 after:rounded-2xl",
   "after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]",
   "dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]",
+  "transition-transform active:scale-[0.98]",
 ].join(" ");
 
 export function AuthActionPanel() {
   const clerk = useClerk();
 
   return (
-    <section className="relative flex flex-1 flex-col items-stretch justify-center overflow-hidden px-5 py-12 sm:px-10 md:px-14 md:py-10 lg:px-16">
+    <section className="relative flex flex-1 flex-col items-stretch justify-center px-4 py-8 sm:px-8 md:px-12 md:py-10 lg:px-16">
       <AuthCardShell>
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="relative mb-5">
+        <div className="mb-6 sm:mb-8 flex flex-col items-center text-center">
+          <div className="relative mb-4 sm:mb-5">
             <div
               aria-hidden
               className="absolute -inset-3.5 rounded-[20px] bg-linear-to-br from-accent/22 via-accent/8 to-transparent opacity-90 blur-xl dark:from-accent/28 dark:via-accent/10"
             />
             <div className={logoTileClassName}>
-              <AppLogo size={52} className="rounded-xl" alt="" />
+              <AppLogo size={48} className="rounded-xl sm:size-[52px]" alt="" />
             </div>
           </div>
 
@@ -45,27 +46,25 @@ export function AuthActionPanel() {
           </div>
         </div>
 
-        {
-          <Button
-            fullWidth
-            size="lg"
-            variant="primary"
-            className={continueButtonClassName}
-            onPress={() => {
-              clerk.openSignIn({ fallbackRedirectUrl: AFTER_AUTH, forceRedirectUrl: AFTER_AUTH });
-            }}
-          >
-            <span className="relative z-1 flex items-center justify-center gap-2">
-              Continue
-              <ArrowRightIcon
-                className="size-4 transition-transform group-hover:translate-x-0.5"
-                aria-hidden
-              />
-            </span>
-          </Button>
-        }
+        <Button
+          fullWidth
+          size="lg"
+          variant="primary"
+          className={continueButtonClassName}
+          onPress={() => {
+            clerk.openSignIn({ fallbackRedirectUrl: AFTER_AUTH, forceRedirectUrl: AFTER_AUTH });
+          }}
+        >
+          <span className="relative z-1 flex items-center justify-center gap-2">
+            Continue
+            <ArrowRightIcon
+              className="size-4 transition-transform group-hover:translate-x-0.5"
+              aria-hidden
+            />
+          </span>
+        </Button>
 
-        <div className="mt-8 flex items-center justify-center gap-2 border-t border-black/6 pt-6 text-[11px] text-[#8E8E93] dark:border-white/8 dark:text-[#636366]">
+        <div className="mt-6 sm:mt-8 flex items-center justify-center gap-2 border-t border-border pt-5 text-[11px] text-muted">
           <ShieldCheckIcon
             className="size-3.5 shrink-0 text-[#34C759] dark:text-[#30D158]"
             strokeWidth={2}

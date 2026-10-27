@@ -3,6 +3,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useChatStore } from "../../store/useChatStore";
 import { APP_NAME, AppLogo } from "../AppLogo";
 import { UserButton } from "@clerk/react";
+import { AppearanceControls } from "../AppearanceControls";
 
 import { SearchField, Tabs } from "@heroui/react";
 import { MessageSquareIcon, UsersIcon } from "lucide-react";
@@ -48,8 +49,8 @@ function ChatSidebar() {
 
   const filteredConversations = normalizedSearchQuery
     ? conversationUsers.filter((conversation) =>
-        conversation.peer.name.toLowerCase().includes(normalizedSearchQuery),
-      )
+      conversation.peer.name.toLowerCase().includes(normalizedSearchQuery),
+    )
     : conversationUsers;
 
   const filteredUsers = normalizedSearchQuery
@@ -58,23 +59,30 @@ function ChatSidebar() {
 
   return (
     <aside
-      className={`w-full shrink-0 flex-col overflow-hidden border-r border-border lg:w-72 ${
-        !isLargeScreen && activeConversationId ? "hidden lg:flex" : "flex"
-      }`}
+      className={`w-full shrink-0 flex-col overflow-hidden border-r border-border md:w-72 lg:w-80 ${!isLargeScreen && activeConversationId ? "hidden md:flex" : "flex"
+        }`}
     >
-      <div className="shrink-0 border-b border-border px-2 pb-2 pt-2.5 sm:px-3 sm:pt-3">
-        <div className="flex items-center gap-2 px-0.5 sm:gap-2.5 sm:px-1">
-          <AppLogo size={32} className="size-8 shrink-0 rounded-[9px] sm:size-8.5" alt="" />
-          <p className="flex-1 truncate text-lg font-bold tracking-tight sm:text-[22px]">
-            {APP_NAME}
-          </p>
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "size-8",
-              },
-            }}
-          />
+      <div className="shrink-0 border-b border-border px-2.5 pb-2.5 pt-2 sm:px-3 sm:pt-3">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <AppLogo size={32} className="size-8 shrink-0 rounded-[9px]" alt="" />
+            <p className="truncate text-base font-bold tracking-tight sm:text-lg">
+              {APP_NAME}
+            </p>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+            <div className="md:hidden">
+              <AppearanceControls compact />
+            </div>
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "size-8",
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -102,11 +110,11 @@ function ChatSidebar() {
 
         <Tabs.ListContainer className="shrink-0 border-b border-border px-2 pb-2 pt-1">
           <Tabs.List className="w-full gap-0.5">
-            <Tabs.Tab id="chats" className="flex-1 justify-center gap-1.5">
+            <Tabs.Tab id="chats" className="flex-1 justify-center gap-1.5 text-xs sm:text-sm">
               <MessageSquareIcon className="size-3.5 opacity-80" aria-hidden />
               Chats
             </Tabs.Tab>
-            <Tabs.Tab id="users" className="flex-1 justify-center gap-1.5">
+            <Tabs.Tab id="users" className="flex-1 justify-center gap-1.5 text-xs sm:text-sm">
               <UsersIcon className="size-3.5 opacity-80" aria-hidden />
               Users
             </Tabs.Tab>
@@ -118,7 +126,7 @@ function ChatSidebar() {
           className="flex-1 overflow-x-hidden overflow-y-auto outline-none"
         >
           {filteredConversations.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-muted">
+            <p className="px-4 py-8 text-center text-xs sm:text-sm text-muted">
               {normalizedSearchQuery
                 ? "No conversations match your search."
                 : "No conversations yet. Switch to Users to start a chat!"}
@@ -137,7 +145,7 @@ function ChatSidebar() {
 
         <Tabs.Panel id="users" className="flex-1 overflow-x-hidden overflow-y-auto outline-none">
           {filteredUsers.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-muted">
+            <p className="px-4 py-8 text-center text-xs sm:text-sm text-muted">
               {normalizedSearchQuery ? "No people match your search." : "No users found."}
             </p>
           ) : (

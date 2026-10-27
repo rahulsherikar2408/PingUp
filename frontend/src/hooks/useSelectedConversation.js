@@ -5,18 +5,13 @@ import { useAuthStore } from "../store/useAuthStore";
 
 // John Doe -> JD
 export function getInitials(name) {
-  return name
+  return (name || "")
     .split(" ")
     .filter(Boolean)
     .map((namePart) => namePart[0])
-    .join("");
+    .join("")
+    .toUpperCase();
 }
-
-// mapUserToConversation is an adapter — it converts the raw backend shapes (a user document + an array of message documents) into the clean view-model that the chat UI components expect to render.
-
-// Two transformations happen:
-// 1. Messages → UI messages
-// 2. User → peer
 
 function mapUserToConversation({ user, messages, authUser, onlineUsers }) {
   const mappedMessages = messages.map((message) => ({
@@ -50,7 +45,8 @@ export function useSelectedConversation() {
   const authUser = useAuthStore((state) => state.authUser);
   const onlineUsers = useAuthStore((state) => state.onlineUsers);
 
-  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  // md breakpoint (768px) aligns mobile single-pane vs tablet/desktop split-pane
+  const isLargeScreen = useMediaQuery("(min-width: 768px)");
 
   const selectedUser = activeConversationId
     ? users.find((user) => user._id === activeConversationId) ||
