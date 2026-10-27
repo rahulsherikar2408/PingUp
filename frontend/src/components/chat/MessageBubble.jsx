@@ -1,5 +1,6 @@
 import { withTransform } from "../../lib/imagekit";
 import { MessageVideo } from "./MessageVideo";
+import { VideoIcon } from "lucide-react";
 
 // Compress + size images for the bubble (q-auto works for images; f-auto picks WebP/AVIF).
 const IMAGE_TRANSFORM = "q-auto,w-640,f-auto";
@@ -8,6 +9,7 @@ export function MessageBubble({ message }) {
   const isOwnMessage = message.role === "me";
   const hasImage = Boolean(message.imageUrl);
   const hasVideo = Boolean(message.videoUrl);
+  const isVideoCall = Boolean(message.text && message.text.includes("Video call"));
 
   return (
     <div className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}>
@@ -27,9 +29,35 @@ export function MessageBubble({ message }) {
           />
         ) : null}
         {hasVideo ? <MessageVideo src={message.videoUrl} /> : null}
-        {message.text ? (
+
+        {isVideoCall ? (
+          <div className="flex items-center gap-2.5 py-1">
+            <div
+              className={`flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-xl shadow-xs ${
+                isOwnMessage
+                  ? "bg-white/20 text-accent-foreground"
+                  : "bg-accent/15 text-accent"
+              }`}
+            >
+              <VideoIcon className="size-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-sm sm:text-[15px] leading-tight">
+                Video call
+              </p>
+              <p
+                className={`text-[11px] sm:text-xs leading-normal ${
+                  isOwnMessage ? "text-accent-foreground/75" : "text-muted"
+                }`}
+              >
+                {isOwnMessage ? "Outgoing call" : "Incoming call"}
+              </p>
+            </div>
+          </div>
+        ) : message.text ? (
           <p className="whitespace-pre-wrap break-words">{message.text}</p>
         ) : null}
+
         <p
           className={`mt-1 text-[10px] sm:text-[11px] tabular-nums ${
             isOwnMessage ? "text-accent-foreground/75" : "text-muted"

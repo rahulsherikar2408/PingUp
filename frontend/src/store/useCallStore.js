@@ -2,7 +2,25 @@ import { create } from "zustand";
 import { StreamVideoClient } from "@stream-io/video-react-sdk";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import { useChatStore } from "./useChatStore";
+import { ringtonePlayer } from "../lib/ringtone";
 import toast from "react-hot-toast";
+
+const CALL_TIMEOUT_MS = 30000; // 30 seconds unanswered timeout
+
+let incomingTimeoutId = null;
+let outgoingTimeoutId = null;
+
+const clearCallTimers = () => {
+  if (incomingTimeoutId) {
+    clearTimeout(incomingTimeoutId);
+    incomingTimeoutId = null;
+  }
+  if (outgoingTimeoutId) {
+    clearTimeout(outgoingTimeoutId);
+    outgoingTimeoutId = null;
+  }
+};
 
 export const useCallStore = create((set, get) => ({
   client: null,
@@ -10,6 +28,7 @@ export const useCallStore = create((set, get) => ({
   callStatus: "idle", // 'idle' | 'calling' | 'incoming' | 'in-call'
   incomingCall: null, // { callId, caller }
   activePeer: null, // { _id, fullName, profilePic, email }
+  isCallAnswered: false,
   isInitializing: false,
 
   initStreamClient: async (user) => {
@@ -60,7 +79,21 @@ export const useCallStore = create((set, get) => ({
     }
 
     const callId = `call_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    set({ callStatus: "calling", activePeer: peerUser });
+    set({ callStatus: "calling", activePeer: peerUser, isCallAnswered: false });
+
+    // Start outgoing ringtone so caller hears ringing feedback
+    ringtonePlayer.play();
+
+    // Start 30-second caller timeout: if receiver doesn't answer, disconnect
+    clearCallTimers();
+    outgoingTimeoutId = setTimeout(() => {
+      const state = get();
+      if (state.callStatus === "calling" || !state.isCallAnswered) {
+        ringtonePlayer.stop();
+        toast.error(`No answer from ${peerUser.fullName || "user"}. Call disconnected.`);
+        get().endCall();
+      }
+    }, CALL_TIMEOUT_MS);
 
     try {
       // 1. Notify the backend and receiver via Socket.io
@@ -73,15 +106,28 @@ export const useCallStore = create((set, get) => ({
         toast("User might be offline, waiting for connection...", { icon: "ℹ️" });
       }
 
+      // Add the video call message to the chat view immediately
+      if (response.data.callMessage) {
+        const { activeConversationId, messages } = useChatStore.getState();
+        if (activeConversationId === peerUser._id) {
+          useChatStore.setState({
+            messages: [...messages, response.data.callMessage],
+          });
+        }
+        useChatStore.getState().getConversations();
+      }
+
       // 2. Create and join the Stream call
       const call = client.call("default", callId);
       await call.join({ create: true });
 
-      set({ call, callStatus: "in-call" });
+      set({ call });
     } catch (error) {
       console.error("Failed to start call:", error);
+      clearCallTimers();
+      ringtonePlayer.stop();
       toast.error(error.response?.data?.message || "Failed to start video call");
-      set({ call: null, callStatus: "idle", activePeer: null });
+      set({ call: null, callStatus: "idle", activePeer: null, isCallAnswered: false });
     }
   },
 
@@ -96,13 +142,45 @@ export const useCallStore = create((set, get) => ({
       return;
     }
 
+    clearCallTimers();
+    // Play ringtone for incoming call
+    ringtonePlayer.play();
+
+    // Start 30-second receiver timeout: if receiver doesn't answer in 30s, auto-disconnect
+    incomingTimeoutId = setTimeout(() => {
+      const { incomingCall } = get();
+      if (incomingCall) {
+        ringtonePlayer.stop();
+        toast(`Missed call from ${incomingCall.caller.fullName}`, { icon: "📞" });
+        get().rejectCall();
+      }
+    }, CALL_TIMEOUT_MS);
+
     set({
       incomingCall: incomingCallData,
       callStatus: "incoming",
+      activePeer: incomingCallData.caller,
+      isCallAnswered: false,
     });
   },
 
+  handleCallAccepted: () => {
+    clearCallTimers();
+    ringtonePlayer.stop();
+    set({ callStatus: "in-call", isCallAnswered: true });
+    toast.success("Call connected");
+  },
+
+  handleCallCancelled: () => {
+    clearCallTimers();
+    ringtonePlayer.stop();
+    set({ incomingCall: null, callStatus: "idle", isCallAnswered: false });
+  },
+
   acceptCall: async () => {
+    clearCallTimers();
+    ringtonePlayer.stop();
+
     const { incomingCall } = get();
     if (!incomingCall) return;
 
@@ -133,6 +211,7 @@ export const useCallStore = create((set, get) => ({
         callStatus: "in-call",
         activePeer: incomingCall.caller,
         incomingCall: null,
+        isCallAnswered: true,
       });
     } catch (error) {
       console.error("Failed to accept call:", error);
@@ -142,6 +221,9 @@ export const useCallStore = create((set, get) => ({
   },
 
   rejectCall: () => {
+    clearCallTimers();
+    ringtonePlayer.stop();
+
     const { incomingCall } = get();
     if (incomingCall) {
       const socket = useAuthStore.getState().socket;
@@ -151,14 +233,23 @@ export const useCallStore = create((set, get) => ({
       });
     }
 
-    set({ incomingCall: null, callStatus: "idle" });
+    set({ incomingCall: null, callStatus: "idle", isCallAnswered: false });
   },
 
   endCall: async () => {
-    const { call, activePeer } = get();
+    clearCallTimers();
+    ringtonePlayer.stop();
+
+    const { call, activePeer, isCallAnswered } = get();
     const socket = useAuthStore.getState().socket;
 
     if (activePeer && socket) {
+      if (!isCallAnswered) {
+        socket.emit("cancelCall", {
+          receiverId: activePeer._id,
+          callId: call?.id,
+        });
+      }
       socket.emit("endCall", {
         peerId: activePeer._id,
         callId: call?.id,
@@ -178,10 +269,14 @@ export const useCallStore = create((set, get) => ({
       callStatus: "idle",
       activePeer: null,
       incomingCall: null,
+      isCallAnswered: false,
     });
   },
 
   disconnectClient: () => {
+    clearCallTimers();
+    ringtonePlayer.stop();
+
     const { client } = get();
     if (client) {
       client.disconnectUser().catch(() => {});
@@ -192,6 +287,7 @@ export const useCallStore = create((set, get) => ({
       callStatus: "idle",
       activePeer: null,
       incomingCall: null,
+      isCallAnswered: false,
     });
   },
 }));

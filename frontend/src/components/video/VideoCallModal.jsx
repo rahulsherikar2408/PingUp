@@ -43,6 +43,7 @@ export function VideoCallModal() {
   const call = useCallStore((state) => state.call);
   const callStatus = useCallStore((state) => state.callStatus);
   const activePeer = useCallStore((state) => state.activePeer);
+  const isCallAnswered = useCallStore((state) => state.isCallAnswered);
   const endCall = useCallStore((state) => state.endCall);
 
   if (callStatus !== "in-call" && callStatus !== "calling") return null;
@@ -65,7 +66,9 @@ export function VideoCallModal() {
               <h2 className="truncate text-xs sm:text-sm font-semibold leading-none text-foreground">
                 {activePeer?.fullName || "Video Call"}
               </h2>
-              <p className="truncate text-[10px] sm:text-xs text-muted">PingUp Video Call</p>
+              <p className="truncate text-[10px] sm:text-xs text-muted">
+                {isCallAnswered ? "Connected" : "Ringing... (waiting for user to answer)"}
+              </p>
             </div>
           </div>
 

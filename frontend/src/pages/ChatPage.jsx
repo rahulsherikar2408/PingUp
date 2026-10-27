@@ -56,8 +56,12 @@ function ChatPage() {
       handleIncomingCall(data);
     };
 
+    const onCallAccepted = () => {
+      useCallStore.getState().handleCallAccepted();
+    };
+
     const onCallRejected = () => {
-      toast.error("Call was declined");
+      toast.error("Call was declined or unanswered");
       endCall();
     };
 
@@ -68,10 +72,11 @@ function ChatPage() {
 
     const onCallCancelled = () => {
       toast("Caller cancelled the call", { icon: "ℹ️" });
-      useCallStore.setState({ incomingCall: null, callStatus: "idle" });
+      useCallStore.getState().handleCallCancelled();
     };
 
     socket.on("incomingCall", onIncomingCall);
+    socket.on("callAccepted", onCallAccepted);
     socket.on("callRejected", onCallRejected);
     socket.on("callEnded", onCallEnded);
     socket.on("callCancelled", onCallCancelled);
@@ -79,6 +84,7 @@ function ChatPage() {
     return () => {
       unsubscribeFromMessages();
       socket.off("incomingCall", onIncomingCall);
+      socket.off("callAccepted", onCallAccepted);
       socket.off("callRejected", onCallRejected);
       socket.off("callEnded", onCallEnded);
       socket.off("callCancelled", onCallCancelled);

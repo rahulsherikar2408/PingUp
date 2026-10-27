@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { generateStreamToken, hasStreamConfig } from "../lib/stream.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
 
 export async function getStreamToken(req, res) {
   try {
@@ -37,6 +38,20 @@ export async function initiateCall(req, res) {
 
     const receiverSocketId = getReceiverSocketId(receiverId);
 
+    // Create a video call message in the chat
+    const callMessage = new Message({
+      senderId: req.user._id,
+      receiverId,
+      text: "📹 Video call started",
+    });
+    await callMessage.save();
+
+    // Broadcast new message to receiver in real time
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", callMessage);
+    }
+
+    // Send incoming call notification to receiver
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("incomingCall", {
         callId,
@@ -53,6 +68,7 @@ export async function initiateCall(req, res) {
       success: true,
       callId,
       receiverOnline: Boolean(receiverSocketId),
+      callMessage,
     });
   } catch (error) {
     console.error("Error initiating call:", error.message);
