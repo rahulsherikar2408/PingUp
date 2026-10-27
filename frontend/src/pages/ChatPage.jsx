@@ -93,7 +93,7 @@ function ChatPage() {
 
   return (
     <div
-      className="flex h-dvh flex-col overflow-hidden p-1 sm:p-2 md:p-5 lg:p-8"
+      className="flex h-dvh flex-col overflow-hidden p-3 sm:p-2 md:p-5 lg:p-8"
       style={frameStyle}
     >
       <div className="mx-auto flex h-full w-full max-w-6xl flex-1 overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-background text-foreground shadow-2xl">

@@ -90,7 +90,7 @@ export function ChatComposer() {
               handleSend();
             }
           }}
-          className="flex-1 rounded-2xl text-[14px] sm:text-[15px]"
+          className="flex-1 rounded-2xl text-[14px] sm:text-[15px] resize-none"
         />
 
         <Button
