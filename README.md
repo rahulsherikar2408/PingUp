@@ -310,9 +310,3 @@ docker run -p 3001:3001 \
 ```
 
 The container will serve the frontend static build from Express and host the API on port `3001`.
-
----
-
-## 📄 License
-
-This project is licensed under the [ISC License](LICENSE).
